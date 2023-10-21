@@ -22,6 +22,7 @@ int main(int ac, char **av) {
 	server_.sin_family = AF_INET;
 	server_.sin_port = htons(8080);
 	server_.sin_addr.s_addr = INADDR_ANY;
+	strcpy(buffer, "");
 	connect(client_socket, (struct sockaddr *)&server_, sizeof(server_));
 	std::string	response = "Hello Server";
 	strcpy(buffer, response.c_str());

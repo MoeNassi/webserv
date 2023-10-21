@@ -21,11 +21,22 @@
 #define BOLD_PURPLE "\033[1;35m"
 #define BOLD_CYAN "\033[1;36m"
 #define BOLD_WHITE "\033[1;37m"
+#define DEF "\033[0m"
 
 #include <iostream>
 #include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <fstream>
 #include <unistd.h>
+#include <map>
+
+#define st_ std::string
+
+class webserv {
+	public :
+		std::map < st_, st_ > cont_;
+		void readFile( st_ file );
+};
 
 #endif
