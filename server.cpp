@@ -14,7 +14,6 @@
 
 void	webserv::readFile( st_ file) {
 	std::fstream	read(file);
-	// if (!read.is_open())
 	st_				input;
 	size_t			found_it;
 
@@ -23,8 +22,6 @@ void	webserv::readFile( st_ file) {
 		if (found_it != std::string::npos)
 			cont_[input.substr(0, found_it - 1)] = input.substr(found_it + 1);
 	}
-	for (std::map < st_, st_ >::iterator it; it != cont_.end(); it++)
-		std::cout << "first -> : " << it->first << "second -> : " << it->second << std::endl;
 }
 
 int main( int ac, char **av ) {
