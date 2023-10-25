@@ -32,11 +32,19 @@
 #include <map>
 
 #define st_ std::string
+# define STACK_MAX 8000000
 
 class webserv {
+	private :
+		std::multimap < st_, st_ > cont_;
+		std::string	buffer;
 	public :
-		std::map < st_, st_ > cont_;
-		void readFile( st_ file );
+		webserv( void );
+		void	setBuffer( std::string buffer );
+		std::string	getBuffer( void );
+		void	set_up( void );
+		void	request( void );
+		~webserv( void );
 };
 
 #endif
