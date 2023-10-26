@@ -6,7 +6,7 @@
 /*   By: mnassi <mnassi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/25 18:15:36 by mnassi            #+#    #+#             */
-/*   Updated: 2023/10/25 18:53:00 by mnassi           ###   ########.fr       */
+/*   Updated: 2023/10/26 21:11:55 by mnassi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,5 +18,7 @@ int main( int ac, char **av ) {
 	(void)av;
 	webserv	init_;
 	init_.set_up();
-	init_.request();
+	if (!init_.getBuffer().empty())
+		init_.HTTPRequest();
+	init_.printVec();
 }

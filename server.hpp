@@ -30,20 +30,35 @@
 #include <fstream>
 #include <unistd.h>
 #include <map>
+#include <vector>
 
 #define st_ std::string
 # define STACK_MAX 8000000
 
 class webserv {
 	private :
-		std::multimap < st_, st_ > cont_;
-		std::string	buffer;
+		st_	Method_;
+		st_	UniformRI;
+		st_	HTTPVersion_;
+		st_	buffer;
+		st_	body;
+		std::vector < std::pair < st_, st_ > > headers;
 	public :
 		webserv( void );
+		void	setMethod_( std::string Method_ );
 		void	setBuffer( std::string buffer );
-		std::string	getBuffer( void );
+		void	setURI( std::string URI );
+		void	setVersion( std::string version );
+		void	setBody( std::string body );
+		std::string	&getBody( void );
+		std::string	&getVersion( void );
+		std::string	&getURI( void );
+		std::string	&getBuffer( void );
+		std::string	&getMethod_( void );
+		void	printVec(void);
 		void	set_up( void );
-		void	request( void );
+		void	HTTPRequest( void );
+		void	FillHeaders_( st_ request_ );
 		~webserv( void );
 };
 

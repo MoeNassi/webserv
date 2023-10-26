@@ -21,19 +21,78 @@ webserv::~webserv(void) {
 void	webserv::setBuffer( std::string	buffer ) {
 	this->buffer = buffer;
 }
-void webserv::request( void ) {
-	std::map < st_, st_ >::iterator it_ = cont_.begin();
-	std::cout << "--->" << static_cast<int>(buffer[buffer.length()- 2]) << std::endl;
-	while (it_ != cont_.end())
-		cont_.insert(std::pair < st_, st_ >());
+void	webserv::setMethod_( std::string Method_ ) {
+	this->Method_ = Method_;
 }
-std::string	webserv::getBuffer( void ) {
+void	webserv::setURI( std::string URI ) {
+	this->UniformRI = URI;
+}
+void	webserv::setVersion( std::string version ) {
+	this->HTTPVersion_ = version;
+}
+void	webserv::setBody( std::string body ) {
+	this->body = body;
+}
+std::string	&webserv::getVersion( void ) {
+	return HTTPVersion_;
+}
+std::string	&webserv::getURI( void ) {
+	return UniformRI;
+}
+std::string	&webserv::getMethod_( void ) {
+	return Method_;
+}
+std::string	&webserv::getBody( void ) {
+	return body;
+}
+std::string	&webserv::getBuffer( void ) {
 	return buffer;
+}
+void	webserv::FillHeaders_( st_ request_ ) {
+	for (int i = 0; request_[i] && !request_.empty(); i++) {
+		size_t found_it = request_.find(": ");
+		size_t found_end = request_.find("\r\n");
+		if ((found_it != std::string::npos && found_end != std::string::npos)) {
+			st_ key = request_.substr(0, found_it);
+			std::cout << key << std::endl;
+			request_.erase(0, found_it + 2);
+			st_ value = request_.substr(0, found_end);
+			request_.erase(0, found_end + 2);
+			headers.push_back(std::make_pair(key, value));
+		}
+		else
+			perror("MetaData Error\n");
+	}
+
+}
+void webserv::HTTPRequest( void ) {
+	size_t delete_ = 0;
+	st_	request = this->getBuffer();
+	for (int i = 0; request[i]; i++) {
+		delete_ = request.find(" ");
+		if (delete_ != std::string::npos && Method_.empty())
+			this->setMethod_(request.substr(0, delete_));
+		else if (delete_ != std::string::npos && UniformRI.empty())
+			this->setURI(request.substr(0, delete_));
+		else
+			break ;
+		request.erase(0, delete_ + 1);
+	}
+	delete_ = request.find("\r\n");
+	if (delete_ != std::string::npos)
+		setVersion(request.substr(0, delete_));
+	request.erase(0, delete_ + 2);
+	FillHeaders_(request);
+}
+void	webserv::printVec(void) {
+	// std::cout << "Method : " << getMethod_() << " URI : " << getURI() << " V : " << getVersion() << std::endl;
+	// for (std::vector < std::pair < st_, st_ > >::iterator it_ = headers.begin(); it_ != headers.end(); it_++)
+	// 	std::cout << it_->first << " ->> " << it_->second << std::endl;
 }
 void	webserv::set_up( void ) { 
 	char	buffer[1024];
 	int	_socket_cl, _socket_ser;
-	const char *port = "8080";
+	const char *port = "2050";
 	struct sockaddr_in server_, client_;
 	_socket_ser = socket(AF_INET, SOCK_STREAM, 0);
 	server_.sin_family = AF_INET;
