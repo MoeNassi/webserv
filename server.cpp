@@ -48,8 +48,18 @@ std::string	&webserv::getBody( void ) {
 std::string	&webserv::getBuffer( void ) {
 	return buffer;
 }
+void	webserv::CheckForBody( st_ request_ ) {
+	std::vector < std::pair < st_, st_ > >::iterator it_ = headers.begin();
+	for (; it_ != headers.end(); it_++) {
+		if ((!it_->first.compare("Content-Length") && atoi(it_->second.c_str()) > 0)
+			|| (!it_->first.compare("Transfer-Encoding") && !it_->second.compare("chunked")))
+			setBody(request_);
+	}
+	if (it_ == headers.end() && !getMethod_().compare("POST") )
+		perror("501 Not Implimented\n");
+}
 void	webserv::FillHeaders_( st_ request_ ) {
-	for (int i = 0; request_[i] && !request_.empty(); i++) {
+	for (int i = 0; request_.substr(0, 2) != "\r\n" && !request_.empty(); i++) {
 		size_t found_it = request_.find(": ");
 		if (found_it != std::string::npos) {
 			st_ key = request_.substr(0, found_it);
@@ -64,7 +74,7 @@ void	webserv::FillHeaders_( st_ request_ ) {
 		else
 			perror("MetaData Error\n");
 	}
-
+	CheckForBody( request_ );
 }
 void webserv::HTTPRequest( void ) {
 	size_t delete_ = 0;
@@ -86,18 +96,18 @@ void webserv::HTTPRequest( void ) {
 	FillHeaders_(request);
 }
 void	webserv::printVec(void) {
-	std::cout << "Method : " << getMethod_() << " URI : " << getURI() << " V : " << getVersion() << std::endl;
+	std::cout << "Method : " << getMethod_() << " URI : " << getURI() << " V : " << getVersion() << "Body : " << getBody() << std::endl;
 	for (std::vector < std::pair < st_, st_ > >::iterator it_ = headers.begin(); it_ != headers.end(); it_++)
 		std::cout << it_->first << " ->> " << it_->second << std::endl;
 }
 void	webserv::set_up( void ) { 
 	char	buffer[1024];
 	int	_socket_cl, _socket_ser;
-	// const char *port = "2050";
+	const char *port = "2050";
 	struct sockaddr_in server_, client_;
 	_socket_ser = socket(AF_INET, SOCK_STREAM, 0);
 	server_.sin_family = AF_INET;
-	server_.sin_port = htons((2050));
+	server_.sin_port = htons(atoi(port));
 	server_.sin_addr.s_addr = INADDR_ANY;
 	bind(_socket_ser, (struct sockaddr *)&server_, sizeof(server_));
 	listen(_socket_ser, 5);

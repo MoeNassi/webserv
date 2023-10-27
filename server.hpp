@@ -59,6 +59,7 @@ class webserv {
 		void	set_up( void );
 		void	HTTPRequest( void );
 		void	FillHeaders_( st_ request_ );
+		void	CheckForBody( st_ request_ );
 		~webserv( void );
 };
 
