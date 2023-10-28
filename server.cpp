@@ -78,6 +78,20 @@ void	webserv::FillHeaders_( st_ request_ ) {
 	}
 	CheckForBody( request_ );
 }
+bool	checkURI( st_ URI ) { // check for body size if its smaller than the one in config file
+	if (URI.length() > 2048)
+		perror("414 Request-URI Too Long\n");
+	st_ Allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~:/?#[]@!$&'()*+,;=%";
+	for (int i = 0; URI[i]; i++) {
+		int check = 0;
+		for (; Allowed[check]; check++)
+			if (Allowed[check] == URI[i])
+				break ;
+		if (Allowed[check] == '\0')
+			perror("400 Bad Request\n");
+	}
+	return true;
+}
 void webserv::HTTPRequest( void ) {
 	size_t delete_ = 0;
 	st_	request = this->getBuffer();
@@ -85,8 +99,10 @@ void webserv::HTTPRequest( void ) {
 		delete_ = request.find(" ");
 		if (delete_ != std::string::npos && Method_.empty())
 			this->setMethod_(request.substr(0, delete_));
-		else if (delete_ != std::string::npos && UniformRI.empty())
+		else if (delete_ != std::string::npos && UniformRI.empty()) {
+			checkURI( request.substr(0, delete_) );
 			this->setURI(request.substr(0, delete_));
+		}
 		else
 			break ;
 		request.erase(0, delete_ + 1);

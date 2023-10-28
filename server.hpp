@@ -63,4 +63,6 @@ class webserv {
 		~webserv( void );
 };
 
+bool	checkURI( st_ URI );
+
 #endif
