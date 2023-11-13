@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mnassi <mnassi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/25 18:15:36 by mnassi            #+#    #+#             */
-/*   Updated: 2023/10/28 17:31:25 by marvin           ###   ########.fr       */
+/*   Created: 2023/11/03 11:15:16 by mnassi            #+#    #+#             */
+/*   Updated: 2023/11/13 17:09:54 by mnassi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "Request/Request.hpp"
+#include "Response/Response.hpp"
 
 int main( int ac, char **av ) {
 	if (ac != 2)
 		return std::cout << BOLD_RED << "Usage : \n" << DEF << BOLD_GREEN << "\tAdd the config file\n" << DEF << std::endl, 0;
 	(void)av;
-	webserv	init_;
-	init_.set_up();
-	if (!init_.getBuffer().empty())
-		init_.HTTPRequest();
-	init_.printVec();
+	Response inst;
+	server	init_;
+	request	inst_;
+	init_.set_up( inst_, inst );
 }
