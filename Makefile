@@ -1,4 +1,4 @@
-NAME = server
+NAME = webserv
 
 CPP = c++
 

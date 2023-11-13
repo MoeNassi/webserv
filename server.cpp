@@ -12,53 +12,21 @@
 
 #include "server.hpp"
 
-webserv::webserv(void) {
-	
-}
-webserv::~webserv(void) {
-
-}
-void	webserv::setBuffer( std::string	buffer ) {
-	this->buffer = buffer;
-}
-void	webserv::setMethod_( std::string Method_ ) {
-	this->Method_ = Method_;
-}
-void	webserv::setURI( std::string URI ) {
-	this->UniformRI = URI;
-}
-void	webserv::setVersion( std::string version ) {
-	this->HTTPVersion_ = version;
-}
-void	webserv::setBody( std::string body ) {
-	this->body = body;
-}
-std::string	&webserv::getVersion( void ) {
-	return HTTPVersion_;
-}
-std::string	&webserv::getURI( void ) {
-	return UniformRI;
-}
-std::string	&webserv::getMethod_( void ) {
-	return Method_;
-}
-std::string	&webserv::getBody( void ) {
-	return body;
-}
-std::string	&webserv::getBuffer( void ) {
-	return buffer;
-}
-void	webserv::CheckForBody( st_ request_ ) {
+int	webserv::CheckForBody( st_ request_ ) {
 	std::vector < std::pair < st_, st_ > >::iterator it_ = headers.begin();
 	for (; it_ != headers.end(); it_++) {
-		if ((!it_->first.compare("Content-Length") && atoi(it_->second.c_str()) > 0)
-			|| (!it_->first.compare("Transfer-Encoding") && !it_->second.compare("chunked"))) { //if it exist and method is post and its value is diff to "chunked" : 501 Not Implimented
+		if ((!it_->first.compare("Content-Length"))
+			|| (!it_->first.compare("Transfer-Encoding"))) { //if it exist and method is post and its value is diff to "chunked" : 501 Not Implimented
+				if (!it_->first.compare("Content-Length") && atoi(it_->second.c_str()) <= 0)
+					return perror("400 Bad Request\n"), 0;
+				else if ((!it_->first.compare("Transfer-Encoding") && it_->second.compare("chunked")))
+					return perror("501 Not Implimented\n"), 0;
 				request_.erase(0, request_.find("\r\n") + 2);
 				setBody(request_);
+				break;
 		}
-	if (it_ == headers.end() && !getMethod_().compare("POST"))
-		perror("400 Bad Request\n");
 	}
+	return 1;
 }
 void	webserv::FillHeaders_( st_ request_ ) {
 	for (int i = 0; request_.substr(0, 2) != "\r\n" && !request_.empty(); i++) {
@@ -76,7 +44,8 @@ void	webserv::FillHeaders_( st_ request_ ) {
 		else
 			perror("MetaData Error\n");
 	}
-	CheckForBody( request_ );
+	if (!CheckForBody( request_ ))
+		return ;
 }
 bool	checkURI( st_ URI ) { // check for body size if its smaller than the one in config file
 	if (URI.length() > 2048)
@@ -140,4 +109,39 @@ void	webserv::set_up( void ) {
 	close(_socket_cl);
 	close(_socket_ser);
 }
+webserv::webserv(void) {
+	
+}
+webserv::~webserv(void) {
 
+}
+void	webserv::setBuffer( std::string	buffer ) {
+	this->buffer = buffer;
+}
+void	webserv::setMethod_( std::string Method_ ) {
+	this->Method_ = Method_;
+}
+void	webserv::setURI( std::string URI ) {
+	this->UniformRI = URI;
+}
+void	webserv::setVersion( std::string version ) {
+	this->HTTPVersion_ = version;
+}
+void	webserv::setBody( std::string body ) {
+	this->body = body;
+}
+std::string	&webserv::getVersion( void ) {
+	return HTTPVersion_;
+}
+std::string	&webserv::getURI( void ) {
+	return UniformRI;
+}
+std::string	&webserv::getMethod_( void ) {
+	return Method_;
+}
+std::string	&webserv::getBody( void ) {
+	return body;
+}
+std::string	&webserv::getBuffer( void ) {
+	return buffer;
+}

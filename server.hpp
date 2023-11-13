@@ -29,11 +29,11 @@
 #include <netinet/in.h>
 #include <fstream>
 #include <unistd.h>
+#include <stdlib.h>
 #include <map>
 #include <vector>
 
 #define st_ std::string
-# define STACK_MAX 8000000
 
 class webserv {
 	private :
@@ -59,7 +59,7 @@ class webserv {
 		void	set_up( void );
 		void	HTTPRequest( void );
 		void	FillHeaders_( st_ request_ );
-		void	CheckForBody( st_ request_ );
+		int	CheckForBody( st_ request_ );
 		~webserv( void );
 };
 
