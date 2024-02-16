@@ -1,35 +1,45 @@
-NAME = server
+NAME		= webserv
+CC			= c++ -g
+FLAGS		= -Wall -Wextra -Werror  -std=c++98
+OBJDIR 		= .obj
 
-CPP = c++
+FILES		= 	Src/main \
+				Src/ConfigFile/myconfig \
+				Src/Server/Server \
+				Src/Request/Request \
+				Src/Response/Response \
+				Src/Cgi/Cgi \
 
-CFLAGS = -Wall -Wextra -Werror -std=c++98 #-g -fsanitize=address
+HEADER		=	Src/ConfigFile/myconfig.hpp \
+				Src/ConfigFile/myconfig.tpp  \
+				Src/Server/Server.hpp \
+				Src/Request/Request.hpp \
+				Src/Response/Response.hpp \
+				Src/Cgi/Cgi.hpp
 
-SRC = Src/Server/Server.cpp Src/Request/Request.cpp Src/Response/Response.cpp Src/ConfigFile/ConfigFile.cpp Src/main.cpp
+SRC			= $(FILES:=.cpp)
+OBJ			= $(addprefix $(OBJDIR)/, $(FILES:=.o))
 
-OBJ = $(SRC:.cpp=.o)
 
-WHITE = \033[1;37m
+all: $(NAME)
 
-HEADER = Src/Server/Server.hpp Src/Request/Request.hpp Src/Response/Response.hpp Src/ConfigFile/ConfigFile.hpp
+$(NAME): $(OBJ) $(HEADER)
+	@$(CC) $(FLAGS) $(OBJ)   -o $(NAME) 
+	@echo "🛰️  Server Ready!"
 
-all : $(NAME)
+$(OBJDIR)/%.o: %.cpp $(HEADER)  Makefile
+	@mkdir -p $(dir $@)
+	@$(CC) $(FLAGS) -g -c $< -o $@ 
 
-$(NAME) : $(OBJ) $(HEADER)
-	@echo "${WHITE}COMPILING ${END}"
-	@$(CPP) $(CFLAGS) $(OBJ) -o $(NAME)
+clean: 
+	@Src/remove
+	@rm -rf $(OBJDIR) $(OBJ)
+	@echo  "🗑️   Deleting OBJS."
 
-%.o : %.cpp $(HEADER)
-	@echo "${WHITE}LINKING ${END}"
-	$(CPP) $(CFLAGS) -c $< -o $@
+fclean: clean
+	@rm -rf  $(NAME)
+	@echo  "🗑️   Deleting $(NAME)."
 
-clean :
-	@echo "${WHITE}removing object files ${END}"
-	@rm -rf $(OBJ)
+re: fclean all
 
-fclean : clean
-	@echo "${WHITE}removing executable ${END}"
-	@rm -rf $(NAME)
-
-re : fclean all
-
-.PHONY : clean fclean re
+.PHONY: all clean fclean re

@@ -1,48 +1,79 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mnassi <mnassi@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/03 11:05:27 by mnassi            #+#    #+#             */
-/*   Updated: 2023/11/13 17:10:24 by mnassi           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#pragma once
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "../ConfigFile/myconfig.hpp"
+#include "../Response/Response.hpp"
 
-#define BOLD_BLACK "\033[1;30m"
-#define BOLD_RED "\033[1;31m"
-#define BOLD_GREEN "\033[1;32m"
-#define BOLD_YELLOW "\033[1;33m"
-#define BOLD_BLUE "\033[1;34m"
-#define BOLD_PURPLE "\033[1;35m"
-#define BOLD_CYAN "\033[1;36m"
-#define BOLD_WHITE "\033[1;37m"
-#define DEF "\033[0m"
-
+#include <deque>
+#include <arpa/inet.h>
+#include <map>
+#include <netinet/in.h>
+#include <stdexcept>
+#include <sys/types.h>
+#include <netdb.h>
+#include <cstdio>
+#include <unistd.h>
+#include <string>
+#include <sys/poll.h>
+#include <sys/socket.h>
+#include <vector>
+#include <ostream>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <exception>
+#include <stdexcept>
+#include <strings.h>
+#include <sys/poll.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <utility>
 #include <iostream>
 #include <cstring>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <poll.h>
 #include <fstream>
-#include <unistd.h>
-#include <map>
-#include <vector>
-#include "../Request/Request.hpp"
-#include "../Response/Response.hpp"
+
+#define MAX_CLIENTS SOMAXCONN
+
 class request;
 class Response;
 
-#define st_ std::string
+class Client {
+public:
+    request req;
+    Response resp;
+    bool gotResp;
 
-class server {
-	public :
-		server( void );
-		void	set_up( request &set, Response &res );
-		~server( void );
+    Client() : gotResp(false) {}
 };
 
-#endif
+class MServer
+{
+	private:
+		const std::vector<Server> servers;
+		struct pollfd *fds;
+		sockaddr_in addrserv;
+		size_t nserv;
+		std::map<int, request> reqsMap;
+		std::map<int, Response> respMap;
+		std::map<int, bool> gotResp;
+		std::map<int, Client> clients;
+
+	public:
+		void handleClient(int clientFd);
+		void acceptClient(int index);
+		void cerror(const st_ &str);
+		void initServers();
+		void Serving();
+		void routin();
+		void sendReesp(int index);
+		int getClientIndex(int fd);
+		int getFreeClientIdx();
+
+		void deleteClient(int index);
+
+		~MServer();
+		MServer();
+};

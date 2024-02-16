@@ -1,24 +1,47 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mnassi <mnassi@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/03 11:15:16 by mnassi            #+#    #+#             */
-/*   Updated: 2023/11/13 17:09:54 by mnassi           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "ConfigFile/myconfig.hpp"
+#include "Server/Server.hpp"
+#include <cstddef>
+#include <exception>
+#include <fcntl.h>
+#include <iostream>
+#include <netinet/in.h>
+#include <stdexcept>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/fcntl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <vector>
+#include <csignal>
+#include <iostream>
+#include <unistd.h>
 
-#include "Request/Request.hpp"
-#include "Response/Response.hpp"
+st_ getConf(int ac, char **av) {
+  st_ conf;
+  if (ac == 1) {
+    std::cout <<  "Loading default Config !!" << std::endl;
+    conf = ".config/.config";
+  } else if (ac == 2) {
+    conf = av[1];
+  } else{
+    std::cerr << "Invalid arguments" << std::endl;
+	  conf = "";
+  }
+  if (access(conf.c_str(), F_OK) != 0)
+    throw std::runtime_error("Please provide a valid config file !!");
+  return conf;
+}
 
-int main( int ac, char **av ) {
-	if (ac != 2)
-		return std::cout << BOLD_RED << "Usage : \n" << DEF << BOLD_GREEN << "\tAdd the config file\n" << DEF << std::endl, 0;
-	(void)av;
-	Response inst;
-	server	init_;
-	request	inst_;
-	init_.set_up( inst_, inst );
+int main(int ac, char **av) {
+
+  signal(SIGPIPE, SIG_IGN);
+  try {
+    Config::LooponServers(getConf(ac, av));
+    MServer server;
+    server.Serving();
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+  }
 }
